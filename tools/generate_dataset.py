@@ -18,10 +18,10 @@ from src.pipeline.manifest import generate_summary_report
 def main():
     parser = argparse.ArgumentParser(description="Generate multi-region Vietnamese elderly voice dataset.")
     parser.add_argument("--output-dir", type=str, default=str(OUTPUT_DATASET_DIR), help="Output directory path")
-    parser.add_argument("--speaker-id", type=str, default=None, help="Specific speaker ID (e.g. spk_nam_01)")
-    parser.add_argument("--category-id", type=str, default=None, help="Specific category ID (e.g. giong_noi_keu_cuu)")
-    parser.add_argument("--sample-rate", type=int, default=24000, help="Target audio sample rate (Hz)")
-    parser.add_argument("--use-fallback", action="store_true", help="Use procedural tone synthesizer instead of ZeroTTS")
+    parser.add_argument("--speaker-id", type=str, default=None, help="Specific speaker ID (e.g. spk_01_nam_dang)")
+    parser.add_argument("--benchmark-only", action="store_true", default=True, help="Generate benchmark greeting sentence for each speaker")
+    parser.add_argument("--sample-rate", type=int, default=48000, help="Target audio sample rate in Hz (default 48000)")
+    parser.add_argument("--use-fallback", action="store_true", help="Use fallback harmonic synthesizer instead of ZeroTTS")
     args = parser.parse_args()
 
     print("==================================================================")
@@ -42,22 +42,19 @@ def main():
             print(f"Error: Speaker '{args.speaker_id}' not found in configs/speakers.yaml")
             sys.exit(1)
 
-    categories = get_prompts_config()
-    if args.category_id:
-        categories = [c for c in categories if c.id.value == args.category_id]
-        if not categories:
-            print(f"Error: Category '{args.category_id}' not found in configs/prompts.yaml")
-            sys.exit(1)
-
     print(f"-> Speakers count: {len(speakers)}")
-    print(f"-> Categories count: {len(categories)}")
-    print(f"-> Target sample rate: {args.sample_rate} Hz")
+    print(f"-> Sample rate: {args.sample_rate} Hz (Studio Quality)")
+    print(f"-> Mode: {'Benchmark Greeting Sample' if args.benchmark_only else 'Full Scenario Dataset'}")
     print(f"-> Output directory: {args.output_dir}\n")
 
     def on_progress(meta):
-        print(f"  [GEN] [{meta.speaker_name}] [{meta.category}] -> {meta.file_name} (F0={meta.f0_mean_hz}Hz, Jitter={meta.jitter_pct}%, Shimmer={meta.shimmer_pct}%)")
+        print(f"  [OK] [{meta.speaker_name} - {meta.age}t - {meta.region}] -> {meta.relative_path} (F0={meta.f0_mean_hz}Hz, Dur={meta.duration_sec}s)")
 
-    manifest = generator.generate_all(speakers=speakers, categories=categories, progress_callback=on_progress)
+    if args.benchmark_only:
+        manifest = generator.generate_all_benchmark(speakers=speakers, progress_callback=on_progress)
+    else:
+        categories = get_prompts_config()
+        manifest = generator.generate_all(speakers=speakers, categories=categories, progress_callback=on_progress)
 
     report = generate_summary_report(manifest)
     print("\n------------------------------------------------------------------")

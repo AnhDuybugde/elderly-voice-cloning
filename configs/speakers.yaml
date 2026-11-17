@@ -1,66 +1,218 @@
-# Danh sách hồ sơ người già đại diện các vùng miền Việt Nam
+# Danh sách 12 hồ sơ người cao tuổi đại diện các vùng miền Việt Nam
+# Bao phủ cân bằng: Giới tính (Nam/Nữ), Độ tuổi (50-84 tuổi), Vùng miền (Bắc - Trung - Nam)
 speakers:
-  - id: "spk_nam_01"
+  - id: "spk_01_nam_dang"
     name: "Ong_Hai_Dang"
     display_name: "Ông Hải Đăng"
     gender: "nam"
     age: 50
     age_bin: "50_59"
     region: "mien_nam"
-    region_display: "Miền Nam (TP. Hồ Chí Minh / Đông Nam Bộ)"
-    sub_region: "dong_nam_bo"
+    region_display: "Miền Nam (TP. Hồ Chí Minh)"
+    sub_region: "tp_ho_chi_minh"
     folder_name: "Ong_Hai_Dang_50_tuoi_Mien_Nam"
     base_voice: "huuduc"
-    profile_notes: "Giọng nam đứng tuổi, âm vực trung trầm, phương ngữ Nam Bộ nhẹ, nhịp nói điềm đạm."
+    secondary_voice: "giahuy"
+    blend_ratio: 0.65
+    cfg_scale: 1.15
+    temperature: 0.75
+    prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
+    profile_notes: "Nam trung niên 50 tuổi, giọng Sài Gòn điềm đạm, ấm áp, âm lượng rõ ràng."
 
-  - id: "spk_bac_01"
+  - id: "spk_02_bac_mai"
     name: "Ba_Le_Thi_Mai"
     display_name: "Bà Lê Thị Mai"
     gender: "nu"
-    age: 65
+    age: 62
     age_bin: "60_69"
     region: "mien_bac"
-    region_display: "Miền Bắc (Hà Nội / Đồng bằng sông Hồng)"
+    region_display: "Miền Bắc (Hà Nội)"
     sub_region: "ha_noi"
-    folder_name: "Ba_Le_Thi_Mai_65_tuoi_Mien_Bac"
+    folder_name: "Ba_Le_Thi_Mai_62_tuoi_Mien_Bac"
     base_voice: "kimoanh"
-    profile_notes: "Giọng nữ lớn tuổi, hơi khàn nhẹ do tuổi tác, phương ngữ Bắc Bộ chuẩn, phát âm rõ."
+    secondary_voice: "baotrang"
+    blend_ratio: 0.70
+    cfg_scale: 1.18
+    temperature: 0.74
+    prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
+    profile_notes: "Nữ 62 tuổi, giọng Hà Nội chuẩn, truyền cảm, ngữ điệu nhẹ nhàng và chững chạc."
 
-  - id: "spk_trung_01"
+  - id: "spk_03_trung_phuoc"
     name: "Ong_Tran_Van_Phuoc"
     display_name: "Ông Trần Văn Phước"
     gender: "nam"
-    age: 72
+    age: 71
     age_bin: "70_79"
     region: "mien_trung"
-    region_display: "Miền Trung (Huế / Quảng Nam - Đà Nẵng)"
-    sub_region: "hue_quang_nam"
-    folder_name: "Ong_Tran_Van_Phuoc_72_tuoi_Mien_Trung"
+    region_display: "Miền Trung (Thừa Thiên Huế)"
+    sub_region: "thua_thien_hue"
+    folder_name: "Ong_Tran_Van_Phuoc_71_tuoi_Mien_Trung"
     base_voice: "huuduc"
-    profile_notes: "Giọng nam già 72 tuổi, độ rung thanh quản rõ rệt, ngữ điệu miền Trung đặc trưng."
+    secondary_voice: "quangminh"
+    blend_ratio: 0.85
+    cfg_scale: 1.20
+    temperature: 0.72
+    prosody_text: "Xin chào Gia An... Gia An có nghe rõ tôi nói không?"
+    profile_notes: "Cụ ông 71 tuổi gốc Huế, giọng trầm sâu, nhịp nói thong thả, có độ ngắt nghỉ tự nhiên."
 
-  - id: "spk_nam_02"
+  - id: "spk_04_nam_cuc"
     name: "Ba_Nguyen_Thi_Cuc"
     display_name: "Bà Nguyễn Thị Cúc"
     gender: "nu"
-    age: 78
+    age: 76
     age_bin: "70_79"
     region: "mien_nam"
-    region_display: "Miền Nam (Tây Nam Bộ / Miền Tây)"
-    sub_region: "tay_nam_bo"
-    folder_name: "Ba_Nguyen_Thi_Cuc_78_tuoi_Mien_Nam"
+    region_display: "Miền Nam (Cần Thơ / Tây Nam Bộ)"
+    sub_region: "can_tho"
+    folder_name: "Ba_Nguyen_Thi_Cuc_76_tuoi_Mien_Nam"
     base_voice: "kimoanh"
-    profile_notes: "Giọng bà cụ 78 tuổi miền Tây, nhịp nói chậm, ngắt nghỉ nhiều, hơi thở yếu."
+    secondary_voice: "maichi"
+    blend_ratio: 0.80
+    cfg_scale: 1.22
+    temperature: 0.73
+    prosody_text: "Xin chào Gia An... Gia An có nghe rõ tôi nói không?"
+    profile_notes: "Bà cụ 76 tuổi miền Tây, giọng hiền từ, hơi thở nhẹ, phát âm chân chất mộc mạc."
 
-  - id: "spk_bac_02"
+  - id: "spk_05_bac_hao"
     name: "Ong_Nguyen_Van_Hao"
     display_name: "Ông Nguyễn Văn Hảo"
     gender: "nam"
     age: 82
     age_bin: "80_plus"
     region: "mien_bac"
-    region_display: "Miền Bắc (Thái Bình / Bắc Bộ)"
+    region_display: "Miền Bắc (Thái Bình)"
     sub_region: "thai_binh"
     folder_name: "Ong_Nguyen_Van_Hao_82_tuoi_Mien_Bac"
     base_voice: "huuduc"
-    profile_notes: "Giọng cụ ông 82 tuổi, run giọng sinh lý người già (presbyphonia), âm lượng nhỏ, hụt hơi."
+    secondary_voice: "giahuy"
+    blend_ratio: 0.90
+    cfg_scale: 1.25
+    temperature: 0.70
+    prosody_text: "Xin chào Gia An... Gia An... có nghe rõ tôi nói không?"
+    profile_notes: "Cụ ông 82 tuổi, giọng già trầm khàn, nhịp nói chậm rãi, có độ rung tự nhiên do tuổi cao."
+
+  - id: "spk_06_trung_lan"
+    name: "Ba_Hoang_Thi_Lan"
+    display_name: "Bà Hoàng Thị Lan"
+    gender: "nu"
+    age: 67
+    age_bin: "60_69"
+    region: "mien_trung"
+    region_display: "Miền Trung (Nghệ An)"
+    sub_region: "nghe_an"
+    folder_name: "Ba_Hoang_Thi_Lan_67_tuoi_Mien_Trung"
+    base_voice: "kimoanh"
+    secondary_voice: "baotrang"
+    blend_ratio: 0.75
+    cfg_scale: 1.20
+    temperature: 0.74
+    prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
+    profile_notes: "Bà 67 tuổi vùng Thanh - Nghệ - Tĩnh, ngữ điệu dứt khoát, chất giọng ấm dạn dĩ."
+
+  - id: "spk_07_trung_khang"
+    name: "Ong_Vo_Van_Khang"
+    display_name: "Ông Võ Văn Khang"
+    gender: "nam"
+    age: 58
+    age_bin: "50_59"
+    region: "mien_trung"
+    region_display: "Miền Trung (Quảng Nam - Đà Nẵng)"
+    sub_region: "quang_nam"
+    folder_name: "Ong_Vo_Van_Khang_58_tuoi_Mien_Trung"
+    base_voice: "huuduc"
+    secondary_voice: "quangminh"
+    blend_ratio: 0.60
+    cfg_scale: 1.15
+    temperature: 0.76
+    prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
+    profile_notes: "Nam 58 tuổi miền Trung, giọng khỏe, âm vang rõ, nhịp nói dứt khoát tự nhiên."
+
+  - id: "spk_08_bac_hong"
+    name: "Ba_Phan_Thi_Hong"
+    display_name: "Bà Phan Thị Hồng"
+    gender: "nu"
+    age: 54
+    age_bin: "50_59"
+    region: "mien_bac"
+    region_display: "Miền Bắc (Hải Phòng)"
+    sub_region: "hai_phong"
+    folder_name: "Ba_Phan_Thi_Hong_54_tuoi_Mien_Bac"
+    base_voice: "baotrang"
+    secondary_voice: "kimoanh"
+    blend_ratio: 0.60
+    cfg_scale: 1.14
+    temperature: 0.76
+    prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
+    profile_notes: "Nữ 54 tuổi, giọng miền Bắc đĩnh đạc, phát âm sắc nét, âm lượng đầy đặn."
+
+  - id: "spk_09_bac_khoi"
+    name: "Ong_Bui_Dinh_Khoi"
+    display_name: "Ông Bùi Đình Khởi"
+    gender: "nam"
+    age: 65
+    age_bin: "60_69"
+    region: "mien_bac"
+    region_display: "Miền Bắc (Nam Định)"
+    sub_region: "nam_dinh"
+    folder_name: "Ong_Bui_Dinh_Khoi_65_tuoi_Mien_Bac"
+    base_voice: "huuduc"
+    secondary_voice: "giahuy"
+    blend_ratio: 0.75
+    cfg_scale: 1.18
+    temperature: 0.73
+    prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
+    profile_notes: "Nam 65 tuổi đồng bằng Bắc Bộ, giọng trầm ấm, phong thái từ tốn chuẩn mực."
+
+  - id: "spk_10_trung_tuyet"
+    name: "Ba_Truong_Thi_Tuyet"
+    display_name: "Bà Trương Thị Tuyết"
+    gender: "nu"
+    age: 73
+    age_bin: "70_79"
+    region: "mien_trung"
+    region_display: "Miền Trung (Quảng Trị)"
+    sub_region: "quang_tri"
+    folder_name: "Ba_Truong_Thi_Tuyet_73_tuoi_Mien_Trung"
+    base_voice: "kimoanh"
+    secondary_voice: "maichi"
+    blend_ratio: 0.85
+    cfg_scale: 1.22
+    temperature: 0.72
+    prosody_text: "Xin chào Gia An... Gia An có nghe rõ tôi nói không?"
+    profile_notes: "Cụ bà 73 tuổi Quảng Trị, âm sắc mộc mạc, tốc độ nói vừa phải, chất phác."
+
+  - id: "spk_11_nam_bao"
+    name: "Ong_Lam_Quoc_Bao"
+    display_name: "Ông Lâm Quốc Bảo"
+    gender: "nam"
+    age: 77
+    age_bin: "70_79"
+    region: "mien_nam"
+    region_display: "Miền Nam (Bến Tre)"
+    sub_region: "ben_tre"
+    folder_name: "Ong_Lam_Quoc_Bao_77_tuoi_Mien_Nam"
+    base_voice: "huuduc"
+    secondary_voice: "tiendat"
+    blend_ratio: 0.82
+    cfg_scale: 1.20
+    temperature: 0.71
+    prosody_text: "Xin chào Gia An... Gia An có nghe rõ tôi nói không?"
+    profile_notes: "Cụ ông 77 tuổi miền Tây sông nước, chất giọng hào sảng nhưng chậm rãi, điềm đạm."
+
+  - id: "spk_12_nam_nuong"
+    name: "Ba_Doan_Thi_Nuong"
+    display_name: "Bà Đoàn Thị Nương"
+    gender: "nu"
+    age: 84
+    age_bin: "80_plus"
+    region: "mien_nam"
+    region_display: "Miền Nam (Tiền Giang)"
+    sub_region: "tien_giang"
+    folder_name: "Ba_Doan_Thi_Nuong_84_tuoi_Mien_Nam"
+    base_voice: "kimoanh"
+    secondary_voice: "hamy"
+    blend_ratio: 0.88
+    cfg_scale: 1.25
+    temperature: 0.70
+    prosody_text: "Xin chào Gia An... Gia An... có nghe rõ tôi nói không?"
+    profile_notes: "Cụ bà 84 tuổi, giọng bà lão Nam Bộ đôn hậu, nhịp chậm, ngắt nghỉ từng nhịp."

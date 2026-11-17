@@ -1,5 +1,5 @@
 """Speech synthesis and aging DSP module."""
-from src.synthesis.aging_dsp import apply_presbyphonia
+from src.synthesis.aging_dsp import apply_analog_warmth_and_aging, apply_presbyphonia
 from src.synthesis.engine import (
     BaseSynthesizer,
     ZeroTTSSynthesizer,
@@ -8,6 +8,7 @@ from src.synthesis.engine import (
 )
 
 __all__ = [
+    "apply_analog_warmth_and_aging",
     "apply_presbyphonia",
     "BaseSynthesizer",
     "ZeroTTSSynthesizer",

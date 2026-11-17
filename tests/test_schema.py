@@ -18,7 +18,7 @@ def test_speakers_config():
 
 def test_prompts_config():
     categories = get_prompts_config()
-    cat_ids = [c.id.value for c in categories]
+    cat_ids = [c.id for c in categories]
     assert "giong_noi_keu_cuu" in cat_ids
     assert "giong_sinh_hoat" in cat_ids
     assert "giong_co_nhieu" in cat_ids

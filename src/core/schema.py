@@ -22,6 +22,7 @@ class CategoryEnum(str, Enum):
     KEU_CUU = "giong_noi_keu_cuu"
     SINH_HOAT = "giong_sinh_hoat"
     CO_NHIEU = "giong_co_nhieu"
+    BENCHMARK = "mau_chao_gia_an"
 
 
 class SpeakerProfile(BaseModel):
@@ -36,6 +37,11 @@ class SpeakerProfile(BaseModel):
     sub_region: str
     folder_name: str
     base_voice: str
+    secondary_voice: Optional[str] = None
+    blend_ratio: float = 1.0
+    cfg_scale: float = 1.15
+    temperature: float = 0.75
+    prosody_text: Optional[str] = None
     profile_notes: Optional[str] = None
 
 
@@ -52,7 +58,7 @@ class PromptItem(BaseModel):
 
 
 class PromptCategory(BaseModel):
-    id: CategoryEnum
+    id: str
     display_name: str
     description: str
     prompts: list[PromptItem]
@@ -84,15 +90,15 @@ class AudioSampleMetadata(BaseModel):
     utterance_text: str
     intent: str
     urgency: str
-    noise_type: str
+    noise_type: str = "clean"
     snr_db: Optional[float] = None
     duration_sec: float
-    sample_rate: int = 24000
+    sample_rate: int = 48000
     channels: int = 1
     f0_mean_hz: Optional[float] = None
     jitter_pct: Optional[float] = None
     shimmer_pct: Optional[float] = None
     hnr_db: Optional[float] = None
     source: str = "synthetic"
-    model_version: str = "zerotts-v0.1-presbyphonia"
+    model_version: str = "zerotts-v2.0-neural-latent-blending"
     created_at: str

@@ -67,8 +67,8 @@ def verify_dataset(dataset_dir: Path | str) -> bool:
             # Check format
             if info.format != "WAV":
                 errors.append(f"{rel_path}: Invalid format {info.format}, expected WAV")
-            if info.samplerate != 24000:
-                warnings.append(f"{rel_path}: Sample rate is {info.samplerate}Hz (expected 24000Hz)")
+            if info.samplerate not in [24000, 48000]:
+                warnings.append(f"{rel_path}: Non-standard sample rate {info.samplerate}Hz")
             if info.channels != 1:
                 warnings.append(f"{rel_path}: Channels count {info.channels} (expected 1 mono)")
 
@@ -94,8 +94,6 @@ def verify_dataset(dataset_dir: Path | str) -> bool:
         print("\nWarnings:")
         for w in warnings[:10]:
             print(f"  [WARN] {w}")
-        if len(warnings) > 10:
-            print(f"  ... and {len(warnings) - 10} more warnings.")
 
     if errors:
         print("\nErrors:")

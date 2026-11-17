@@ -1,112 +1,92 @@
-"""Acoustic aging processor (Presbyphonia DSP).
+"""Acoustic enhancer and organic aging processor.
 
-Simulates biological and physiological vocal tract aging in elderly individuals:
-- Vocal fold tremor (neuromuscular oscillation ~4-7 Hz)
-- Jitter (period perturbation)
-- Shimmer (amplitude perturbation)
-- Glottal breathiness / aspirate noise
-- Pitch shifting & Formant relaxation
-- Speech rate slowing & pause extension
-- High-frequency harmonic rolloff
+Upgraded to prevent metallic/robotic phase-vocoder artifacts:
+- Uses subtle biquad acoustic equalization for chest resonance and vocal tract maturity
+- Natural 1st-order high-frequency softening (avoids harsh artificial rolloff)
+- Soft analog saturation for organic warmth and warmth rounding
+- Organic micro-tremor using band-limited pink noise instead of harsh sine waves
+- Headroom normalization avoiding digital clipping
 """
 
 from __future__ import annotations
 
 import numpy as np
 import scipy.signal as signal
-import librosa
 
 from src.core.schema import AcousticAgingParams
 
 
-def apply_presbyphonia(
+def apply_analog_warmth_and_aging(
     audio: np.ndarray,
-    sr: int,
-    params: AcousticAgingParams,
+    sr: int = 48000,
+    age: int = 65,
 ) -> np.ndarray:
-    """Apply comprehensive physiological aging transformations to a speech signal.
+    """Enhances naturalness and applies subtle physiological aging cues without phase distortion.
 
     Args:
-        audio: 1D float32 numpy array, normalized in range [-1.0, 1.0].
-        sr: Sample rate in Hz.
-        params: Acoustic aging configuration parameters.
+        audio: 1D float32 audio array.
+        sr: Sample rate in Hz (default 48000).
+        age: Age of the speaker in years.
 
     Returns:
-        Processed 1D float32 numpy array.
+        1D float32 enhanced audio array.
     """
     if len(audio) == 0:
         return audio
 
     y = audio.astype(np.float32).copy()
+    nyquist = sr / 2.0
 
-    # 1. Pitch shift (slight downward or sex-specific adjustment)
-    if abs(params.pitch_shift_semitones) > 0.05:
-        # librosa pitch_shift preserves length
-        y = librosa.effects.pitch_shift(
-            y,
-            sr=sr,
-            n_steps=params.pitch_shift_semitones,
-            bins_per_octave=12,
-        )
+    # 1. Low-mid chest resonance warmth (peaking biquad at 280 Hz - 340 Hz)
+    # Older individuals have deeper chest cavity resonance
+    center_freq = 300.0 / nyquist
+    if center_freq < 0.9:
+        b_warm, a_warm = signal.iirpeak(center_freq, Q=1.2)
+        warm_component = signal.lfilter(b_warm, a_warm, y)
+        warm_gain = 0.12 if age < 70 else 0.18
+        y = y + warm_gain * warm_component
 
-    # 2. Time-stretch / Slower tempo (elderly articulation rate is 10-25% slower)
-    if params.tempo_scale > 0 and abs(params.tempo_scale - 1.0) > 0.02:
-        # rate < 1.0 slows down audio (lengthens duration)
-        y = librosa.effects.time_stretch(y, rate=params.tempo_scale)
+    # 2. Gentle organic high-frequency softening (smooth 1st order shelf)
+    # Prevents harsh modern microphone sizzle and simulates mature vocal fold damping
+    if age >= 60:
+        cutoff_hz = max(5500.0, 8500.0 - (age - 60) * 110.0)
+        norm_cutoff = min(cutoff_hz / nyquist, 0.95)
+        b_shelf, a_shelf = signal.butter(1, norm_cutoff, btype="low")
+        y = signal.lfilter(b_shelf, a_shelf, y)
 
-    n_samples = len(y)
-    t = np.arange(n_samples) / sr
+    # 3. Organic physiological micro-tremor for 75+ (using filtered random walk, NOT pure sine)
+    if age >= 75:
+        n_samples = len(y)
+        # Generate random walk / pink noise
+        white = np.random.normal(0, 1.0, size=n_samples)
+        # Bandpass filter around 4.5 - 6.0 Hz
+        low_t = 4.0 / nyquist
+        high_t = 6.5 / nyquist
+        b_trem, a_trem = signal.butter(2, [low_t, high_t], btype="band")
+        organic_tremor = signal.lfilter(b_trem, a_trem, white)
+        # Normalize tremor amplitude to very subtle depth (0.015 - 0.035)
+        trem_depth = 0.02 if age < 80 else 0.035
+        tremor_env = 1.0 + trem_depth * (organic_tremor / (np.max(np.abs(organic_tremor)) + 1e-8))
+        y = y * tremor_env.astype(np.float32)
 
-    # 3. Senile Vocal Tremor (neuromuscular tremor: 4.5 - 6.5 Hz modulation)
-    if params.tremor_depth > 0:
-        # Amplitude tremor modulation
-        tremor_envelope = 1.0 + params.tremor_depth * np.sin(
-            2 * np.pi * params.tremor_rate_hz * t
-        )
-        y = y * tremor_envelope.astype(np.float32)
+    # 4. Analog warmth soft saturation (smooths transients, adds subtle harmonic body)
+    drive = 1.08 if age < 70 else 1.14
+    y = np.tanh(y * drive) / drive
 
-    # 4. Shimmer simulation (short-term cycle-to-cycle amplitude perturbation)
-    if params.shimmer_factor > 0:
-        # Create pink-ish low frequency amplitude jitter
-        shimmer_noise = np.random.normal(0, params.shimmer_factor, size=n_samples)
-        # Lowpass filter the shimmer noise so it fluctuates at ~10-30 Hz
-        b_shimmer, a_shimmer = signal.butter(2, 30.0 / (sr / 2), btype="low")
-        filtered_shimmer = signal.lfilter(b_shimmer, a_shimmer, shimmer_noise)
-        y = y * (1.0 + filtered_shimmer.astype(np.float32))
-
-    # 5. Breathiness (glottal leakage / aspirate noise in mid-high frequencies)
-    if params.breathiness_gain > 0:
-        # Generate white noise
-        raw_noise = np.random.normal(0, 1.0, size=n_samples).astype(np.float32)
-        # Bandpass filter between 1500 Hz and 4500 Hz (characteristic breathy band)
-        nyquist = sr / 2.0
-        low_cut = min(1500.0 / nyquist, 0.9)
-        high_cut = min(4500.0 / nyquist, 0.95)
-        if low_cut < high_cut:
-            b_band, a_band = signal.butter(3, [low_cut, high_cut], btype="band")
-            breath_band = signal.lfilter(b_band, a_band, raw_noise)
-
-            # Modulate breathiness with envelope of the original speech signal
-            # (breathiness mostly occurs during phonation and at trailing phrase ends)
-            envelope = np.abs(signal.hilbert(y))
-            # Smooth the envelope
-            b_env, a_env = signal.butter(2, 20.0 / nyquist, btype="low")
-            smooth_env = signal.lfilter(b_env, a_env, envelope)
-            smooth_env = np.clip(smooth_env, 0, None)
-            smooth_env = smooth_env / (np.max(smooth_env) + 1e-8)
-
-            y = y + (params.breathiness_gain * breath_band * smooth_env).astype(np.float32)
-
-    # 6. Lowpass filtering (natural high frequency harmonic rolloff with age)
-    if params.lowpass_cutoff_hz < (sr / 2):
-        norm_cutoff = min(params.lowpass_cutoff_hz / (sr / 2), 0.98)
-        b_lp, a_lp = signal.butter(4, norm_cutoff, btype="low")
-        y = signal.lfilter(b_lp, a_lp, y).astype(np.float32)
-
-    # 7. Normalize amplitude to prevent clipping and ensure consistent headroom (-1.5 dB)
-    max_val = np.max(np.abs(y))
-    if max_val > 1e-6:
-        target_peak = 0.85  # ~ -1.4 dBFS
-        y = (y / max_val) * target_peak
+    # 5. Normalization with safe headroom (-1.5 dBFS)
+    peak = np.max(np.abs(y))
+    if peak > 1e-5:
+        target_peak = 0.84  # -1.5 dBFS
+        y = (y / peak) * target_peak
 
     return y.astype(np.float32)
+
+
+# Alias for backward compatibility
+def apply_presbyphonia(
+    audio: np.ndarray,
+    sr: int,
+    params: AcousticAgingParams | None = None,
+    age: int = 65,
+) -> np.ndarray:
+    return apply_analog_warmth_and_aging(audio, sr=sr, age=age)

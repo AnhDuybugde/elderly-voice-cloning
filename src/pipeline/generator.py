@@ -13,14 +13,13 @@ from src.core.config import (
     OUTPUT_DATASET_DIR,
     get_speakers_config,
     get_prompts_config,
-    get_aging_params_for_age,
 )
 from src.core.schema import (
     SpeakerProfile,
     PromptCategory,
     AudioSampleMetadata,
 )
-from src.synthesis.aging_dsp import apply_presbyphonia
+from src.synthesis.aging_dsp import apply_analog_warmth_and_aging
 from src.synthesis.engine import BaseSynthesizer, get_synthesizer
 from src.noise.augment import mix_audio_with_noise
 from src.metrics.acoustic_features import analyze_audio_sample
@@ -29,6 +28,8 @@ from src.pipeline.manifest import (
     export_manifest_csv,
     generate_summary_report,
 )
+
+BENCHMARK_PROMPT = "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
 
 
 def slugify(text: str) -> str:
@@ -52,63 +53,56 @@ class ElderlyVoiceDatasetGenerator:
         self,
         output_dir: Path | str | None = None,
         synthesizer: BaseSynthesizer | None = None,
-        sample_rate: int = 24000,
+        sample_rate: int = 48000,
     ):
         self.output_dir = Path(output_dir) if output_dir else OUTPUT_DATASET_DIR
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.synthesizer = synthesizer or get_synthesizer()
         self.sample_rate = sample_rate
 
-    def generate_sample(
+    def generate_benchmark_greeting(
         self,
         speaker: SpeakerProfile,
-        category: PromptCategory,
-        prompt_item,
-        out_folder: Path,
+        custom_text: str | None = None,
     ) -> AudioSampleMetadata:
-        """Synthesize and process a single audio sample."""
-        # 1. Synthesize base speech
+        """Synthesize the standard benchmark greeting for a speaker profile."""
+        spk_dir = self.output_dir / speaker.folder_name
+        spk_dir.mkdir(parents=True, exist_ok=True)
+
+        text_to_speak = custom_text or speaker.prosody_text or BENCHMARK_PROMPT
+
+        # 1. Direct neural synthesis with latent blending
         raw_audio, sr = self.synthesizer.synthesize(
-            text=prompt_item.text,
+            text=text_to_speak,
             voice=speaker.base_voice,
+            secondary_voice=speaker.secondary_voice,
+            blend_ratio=speaker.blend_ratio,
+            cfg_scale=speaker.cfg_scale,
+            temperature=speaker.temperature,
             target_sr=self.sample_rate,
         )
 
-        # 2. Apply Presbyphonia aging DSP according to speaker age
-        aging_params = get_aging_params_for_age(speaker.age_bin)
-        aged_audio = apply_presbyphonia(raw_audio, sr=self.sample_rate, params=aging_params)
+        # 2. Organic analog warmth & aging (avoids metallic phase vocoder artifacts)
+        enhanced_audio = apply_analog_warmth_and_aging(
+            raw_audio,
+            sr=self.sample_rate,
+            age=speaker.age,
+        )
 
-        # 3. Apply noise if category is 'giong_co_nhieu'
-        noise_type = "clean"
-        snr_db = None
-        final_audio = aged_audio
-
-        if category.id == "giong_co_nhieu":
-            noise_type = prompt_item.noise_profile or "tv_background"
-            snr_db = prompt_item.snr_db if prompt_item.snr_db is not None else 10.0
-            final_audio = mix_audio_with_noise(
-                aged_audio,
-                noise_profile=noise_type,
-                snr_db=snr_db,
-                sr=self.sample_rate,
-            )
-
-        # 4. Generate explicit file name
-        # format: <speaker_slug>_<age>t_<prompt_code>.wav
-        # example: ong_hai_dang_50t_keu_cuu_01_khan_cap.wav
+        # 3. File naming: <speaker_slug>_<age>t_cau_chao_gia_an.wav
         speaker_slug = slugify(speaker.name)
-        file_name = f"{speaker_slug}_{speaker.age}t_{prompt_item.code}.wav"
-        file_path = out_folder / file_name
+        file_name = f"{speaker_slug}_{speaker.age}t_cau_chao_gia_an.wav"
+        file_path = spk_dir / file_name
 
-        # 5. Write 16-bit PCM WAV
-        sf.write(file_path, final_audio, self.sample_rate, subtype="PCM_16")
+        # 4. Save 16-bit PCM WAV
+        sf.write(file_path, enhanced_audio, self.sample_rate, subtype="PCM_16")
 
-        # 6. Extract acoustic metrics
-        acoustics = analyze_audio_sample(final_audio, self.sample_rate)
+        # 5. Extract acoustic metrics
+        acoustics = analyze_audio_sample(enhanced_audio, self.sample_rate)
 
-        # 7. Build metadata
+        # 6. Build metadata
         rel_path = file_path.relative_to(self.output_dir).as_posix()
-        sample_id = f"{speaker.id}_{category.id}_{prompt_item.id}"
+        sample_id = f"{speaker.id}_benchmark_greeting"
 
         metadata = AudioSampleMetadata(
             sample_id=sample_id,
@@ -121,12 +115,12 @@ class ElderlyVoiceDatasetGenerator:
             age_bin=speaker.age_bin,
             gender=speaker.gender.value,
             region=speaker.region.value,
-            category=category.id.value,
-            utterance_text=prompt_item.text,
-            intent=prompt_item.intent,
-            urgency=prompt_item.urgency,
-            noise_type=noise_type,
-            snr_db=snr_db,
+            category="mau_chao_gia_an",
+            utterance_text=text_to_speak,
+            intent="GREETING_BENCHMARK",
+            urgency="normal",
+            noise_type="clean",
+            snr_db=None,
             duration_sec=acoustics["duration_sec"],
             sample_rate=self.sample_rate,
             channels=1,
@@ -135,45 +129,26 @@ class ElderlyVoiceDatasetGenerator:
             shimmer_pct=acoustics["shimmer_pct"],
             hnr_db=acoustics["hnr_db"],
             source="synthetic",
-            model_version="zerotts-v0.1-presbyphonia",
+            model_version="zerotts-v2.0-neural-latent-blending",
             created_at=datetime.now(timezone.utc).isoformat(),
         )
         return metadata
 
-    def generate_all(
+    def generate_all_benchmark(
         self,
         speakers: list[SpeakerProfile] | None = None,
-        categories: list[PromptCategory] | None = None,
         progress_callback=None,
     ) -> list[AudioSampleMetadata]:
-        """Generate complete dataset for all speakers and categories."""
+        """Generate benchmark greeting for all configured speakers."""
         if speakers is None:
             speakers = get_speakers_config()
-        if categories is None:
-            categories = get_prompts_config()
 
         manifest: list[AudioSampleMetadata] = []
-
         for spk in speakers:
-            # Create speaker folder: e.g. Ong_Hai_Dang_50_tuoi_Mien_Nam
-            spk_dir = self.output_dir / spk.folder_name
-            spk_dir.mkdir(parents=True, exist_ok=True)
-
-            for cat in categories:
-                # Create category folder: giong_noi_keu_cuu, giong_sinh_hoat, giong_co_nhieu
-                cat_dir = spk_dir / cat.id.value
-                cat_dir.mkdir(parents=True, exist_ok=True)
-
-                for item in cat.prompts:
-                    meta = self.generate_sample(
-                        speaker=spk,
-                        category=cat,
-                        prompt_item=item,
-                        out_folder=cat_dir,
-                    )
-                    manifest.append(meta)
-                    if progress_callback:
-                        progress_callback(meta)
+            meta = self.generate_benchmark_greeting(speaker=spk)
+            manifest.append(meta)
+            if progress_callback:
+                progress_callback(meta)
 
         # Export manifest files
         manifest_jsonl_path = self.output_dir / "manifest.jsonl"
