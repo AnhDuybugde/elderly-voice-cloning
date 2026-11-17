@@ -1,0 +1,57 @@
+# Cấu hình tham số sinh lý âm học lão hóa (Presbyphonia) theo độ tuổi
+age_groups:
+  "50_59":
+    description: "Độ tuổi 50-59: Bắt đầu lão hóa nhẹ, âm sắc hơi trầm, nhịp nói ổn định"
+    tempo_scale: 0.95
+    pitch_shift_semitones: -0.5
+    tremor_depth: 0.012
+    tremor_rate_hz: 5.5
+    jitter_factor: 0.012
+    shimmer_factor: 0.025
+    breathiness_gain: 0.015
+    lowpass_cutoff_hz: 7500
+
+  "60_69":
+    description: "Độ tuổi 60-69: Dây thanh âm giảm độ đàn hồi, hơi khàn nhẹ, tốc độ nói chậm lại"
+    tempo_scale: 0.88
+    pitch_shift_semitones: -1.2
+    tremor_depth: 0.025
+    tremor_rate_hz: 5.2
+    jitter_factor: 0.022
+    shimmer_factor: 0.045
+    breathiness_gain: 0.030
+    lowpass_cutoff_hz: 7000
+
+  "70_79":
+    description: "Độ tuổi 70-79: Lão hóa rõ rệt, rung thanh quản (vocal tremor), hụt hơi, ngắt nghỉ dài hơn"
+    tempo_scale: 0.80
+    pitch_shift_semitones: -1.8
+    tremor_depth: 0.045
+    tremor_rate_hz: 4.8
+    jitter_factor: 0.035
+    shimmer_factor: 0.070
+    breathiness_gain: 0.050
+    lowpass_cutoff_hz: 6500
+
+  "80_plus":
+    description: "Độ tuổi 80+: Giọng yếu, run rẩy cao độ, biên độ dao động thất thường, hơi thở dồn dập"
+    tempo_scale: 0.72
+    pitch_shift_semitones: -2.2
+    tremor_depth: 0.065
+    tremor_rate_hz: 4.5
+    jitter_factor: 0.050
+    shimmer_factor: 0.095
+    breathiness_gain: 0.075
+    lowpass_cutoff_hz: 6000
+
+# Tiêu chuẩn âm học kiểm định (Benchmark Gates theo plan.md Giai đoạn 5)
+acoustic_benchmarks:
+  sample_rate_hz: 24000
+  target_format: "wav"
+  bit_depth: 16
+  channels: 1
+  f0_range_male: [80.0, 160.0]
+  f0_range_female: [140.0, 240.0]
+  min_hnr_db: 10.0
+  max_jitter_percent: 5.0
+  max_shimmer_percent: 10.0
