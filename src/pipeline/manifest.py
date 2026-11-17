@@ -31,7 +31,12 @@ def export_manifest_csv(metadata_list: Sequence[AudioSampleMetadata], output_pat
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         for item in metadata_list:
-            writer.writerow(item.model_dump())
+            row = item.model_dump()
+            # Nested fields (dsp_params, voice_mix, qc_reasons) are stored as JSON strings
+            for k, v in row.items():
+                if isinstance(v, (dict, list)):
+                    row[k] = json.dumps(v, ensure_ascii=False)
+            writer.writerow(row)
 
 
 def generate_summary_report(metadata_list: Sequence[AudioSampleMetadata]) -> dict[str, any]:
@@ -50,7 +55,11 @@ def generate_summary_report(metadata_list: Sequence[AudioSampleMetadata]) -> dic
         by_region[item.region] = by_region.get(item.region, 0) + 1
         by_age_bin[item.age_bin] = by_age_bin.get(item.age_bin, 0) + 1
 
+    qc_known = [m for m in metadata_list if getattr(m, "qc_pass", None) is not None]
+    qc_pass_rate = (sum(1 for m in qc_known if m.qc_pass) / len(qc_known)) if qc_known else None
+
     return {
+        "qc_pass_rate": round(qc_pass_rate, 4) if qc_pass_rate is not None else None,
         "total_samples": total_samples,
         "total_duration_sec": round(total_duration, 2),
         "total_duration_min": round(total_duration / 60.0, 2),

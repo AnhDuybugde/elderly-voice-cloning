@@ -1,5 +1,8 @@
 # 04. Nhật Ký Nâng Cấp Chất Lượng Âm Thanh (Version 2.0)
 
+> [!WARNING]
+> **Đã có v3.0** — xem [[07_V3_HUMANIZE_ENGINE]]. Các số jitter/shimmer/HNR trong manifest v2.0 được đo bằng thuật toán cũ bị lỗi (jitter nam luôn kẹp ở 15%, HNR = 0 dB). Đo lại bằng Praat cho thấy v2.0 **không có khác biệt theo tuổi** và các cụ cùng giới gần như cùng một giọng.
+
 *Liên kết:* [[00_INDEX]] | [[01_PROJECT_OVERVIEW]] | [[02_ARCHITECTURE_AND_TECH]] | [[03_DATASET_AND_ROSTER]]
 
 ---

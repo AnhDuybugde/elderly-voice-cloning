@@ -48,3 +48,10 @@ def get_aging_params_for_age(age_bin: str, path: Path | str | None = None) -> Ac
     default_data = dict(groups.get("60_69", {}))
     default_data.pop("description", None)
     return AcousticAgingParams(**default_data)
+
+
+def get_acoustic_profile(gender: str, age_bin: str) -> dict[str, Any]:
+    """v3.0 gender x age-bin profile (target / qc / dsp incl. calibrated overrides / traits)."""
+    from src.synthesis.voice_profile import get_profile
+
+    return get_profile(gender, age_bin)

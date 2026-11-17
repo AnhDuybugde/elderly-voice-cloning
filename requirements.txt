@@ -5,6 +5,15 @@ librosa>=0.10.0
 scipy>=1.10.0
 numpy>=1.24.0
 
+# v3.0 aging engine & clinical-grade measurement
+pyworld>=0.3.4              # WORLD vocoder: F0 / spectral envelope / aperiodicity
+praat-parselmouth>=0.4.3    # Praat jitter / shimmer / HNR / CPPS
+
+# v3.0 QC gate (optional at runtime: only used when QC is on)
+faster-whisper>=1.0.0       # ASR for CER
+transformers>=4.40.0        # WavLM-SV speaker embeddings
+torch>=2.0.0
+
 # Data validation & configuration
 pydantic>=2.0.0
 pyyaml>=6.0

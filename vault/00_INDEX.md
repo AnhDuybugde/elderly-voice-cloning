@@ -14,6 +14,7 @@ graph TD
     MOC --> Upgrades["[[04_ACOUSTIC_UPGRADE_NOTES]]<br/>Nhật ký Nâng cấp Âm thanh v2.0"]
     MOC --> Guide["[[05_HOW_TO_RUN_AND_EXTEND]]<br/>Hướng dẫn Chạy & Mở rộng"]
     MOC --> Roadmap["[[06_ROADMAP_AND_COMPLIANCE]]<br/>Lộ trình Plan.md & Pháp lý Bản quyền"]
+    MOC --> V3["[[07_V3_HUMANIZE_ENGINE]]<br/>v3.0 Humanize: WORLD Aging + QC"]
 ```
 
 ---
@@ -52,6 +53,11 @@ graph TD
    - 6 giai đoạn phát triển theo [[plan.md]].
    - Ranh giới kỹ thuật: Close-talk sạch vs Far-field / Room impulse response của dev khác.
    - Bộ tiêu chuẩn văn bản Consent và bảo vệ dữ liệu sinh trắc học người già.
+
+7. **[[07_V3_HUMANIZE_ENGINE]] — Version 3.0: Humanize Giọng Người Cao Tuổi**
+   - Engine lão hoá **WORLD vocoder**: F0 theo tuổi (giữ thanh điệu), jitter/shimmer theo chu kỳ, tremor trôi, hụt hơi, vocal fry, nhịp nói & ngắt nghỉ.
+   - Mỗi cụ một danh tính: `voice_mix` nhiều giọng + `voice_traits` (dấu vân tay tất định).
+   - Calibration theo Praat, QC gate (Praat + ASR CER + WavLM-SV), sinh 12 cụ × 15 câu × 3 biến thể.
 
 ---
 

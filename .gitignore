@@ -42,3 +42,7 @@ htmlcov/
 tmp/
 /tmp/
 *.tmp
+
+# Listening-test bundles (contain answer keys) and noisy copies
+data/listening_test/
+data/elderly_dataset/_noisy/

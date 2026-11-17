@@ -1,5 +1,8 @@
 """Acoustic enhancer and organic aging processor.
 
+v3.0: `apply_aging_v3` / `apply_presbyphonia` route to the WORLD engine (world_aging.py).
+`apply_analog_warmth_and_aging` is the original v2 EQ-only processor, kept unchanged for reference.
+
 Upgraded to prevent metallic/robotic phase-vocoder artifacts:
 - Uses subtle biquad acoustic equalization for chest resonance and vocal tract maturity
 - Natural 1st-order high-frequency softening (avoids harsh artificial rolloff)
@@ -82,11 +85,55 @@ def apply_analog_warmth_and_aging(
     return y.astype(np.float32)
 
 
+def apply_aging_v3(
+    audio: np.ndarray,
+    sr: int = 48000,
+    age: int = 65,
+    gender: str = "nam",
+    keep_length: bool = True,
+    seed: int | None = 0,
+) -> np.ndarray:
+    """v3.0 WORLD aging with age-bin defaults (no speaker fingerprint, no tempo change).
+
+    For full per-speaker / per-tone control use
+    `src.synthesis.voice_profile.resolve_aging_params` + `src.synthesis.world_aging.age_voice`.
+    """
+    from src.synthesis.voice_profile import age_bin_for, get_profile
+    from src.synthesis.world_aging import age_voice
+    from src.core.schema import VoiceAgingParams
+
+    prof = get_profile(gender, age_bin_for(age))
+    dsp = dict(prof["dsp"])
+    params = VoiceAgingParams(
+        target_f0_hz=0.0,
+        jitter_pct=dsp["jitter_pct"],
+        shimmer_db=dsp["shimmer_db"],
+        tremor_f0_depth=dsp["tremor_f0_depth"],
+        tremor_amp_depth=dsp["tremor_amp_depth"],
+        breathiness=dsp["breathiness"],
+        formant_warp=dsp["formant_warp"],
+        spectral_tilt_db_oct=dsp["spectral_tilt_db_oct"],
+        creak_prob=dsp["creak_prob"],
+        voice_break_prob=0.0,
+        tempo_scale=1.0,
+        pause_scale=1.0,
+        inhale_prob=0.0,
+        chest_warmth=dsp["chest_warmth"],
+        hf_cutoff_hz=dsp["hf_cutoff_hz"],
+    )
+    y = age_voice(audio, sr, params, rng=np.random.default_rng(seed), gender=gender)
+    if keep_length:
+        y = np.pad(y, (0, max(0, len(audio) - len(y))))[: len(audio)]
+    return y.astype(np.float32)
+
+
 # Alias for backward compatibility
 def apply_presbyphonia(
     audio: np.ndarray,
     sr: int,
     params: AcousticAgingParams | None = None,
     age: int = 65,
+    gender: str = "nam",
 ) -> np.ndarray:
-    return apply_analog_warmth_and_aging(audio, sr=sr, age=age)
+    """Backward-compatible entry point, now routed to the v3.0 WORLD engine."""
+    return apply_aging_v3(audio, sr=sr, age=age, gender=gender)

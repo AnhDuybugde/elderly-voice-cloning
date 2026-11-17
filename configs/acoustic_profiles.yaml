@@ -1,4 +1,5 @@
 # Cấu hình tham số sinh lý âm học lão hóa (Presbyphonia) theo độ tuổi
+# [legacy v2] age_groups giữ lại để tương thích ngược. Engine v3.0 dùng mục `profiles` bên dưới.
 age_groups:
   "50_59":
     description: "Độ tuổi 50-59: Bắt đầu lão hóa nhẹ, âm sắc hơi trầm, nhịp nói ổn định"
@@ -46,7 +47,7 @@ age_groups:
 
 # Tiêu chuẩn âm học kiểm định (Benchmark Gates theo plan.md Giai đoạn 5)
 acoustic_benchmarks:
-  sample_rate_hz: 24000
+  sample_rate_hz: 48000
   target_format: "wav"
   bit_depth: 16
   channels: 1
@@ -55,3 +56,86 @@ acoustic_benchmarks:
   min_hnr_db: 10.0
   max_jitter_percent: 5.0
   max_shimmer_percent: 10.0
+
+# =============================================================================
+# v3.0 — WORLD aging engine: hồ sơ theo GIỚI TÍNH × NHÓM TUỔI
+# -----------------------------------------------------------------------------
+# target : mục tiêu âm học đo bằng Praat (lấy từ docs/ACOUSTIC_BENCHMARK.md)
+#          LƯU Ý (nam): giọng nam ZeroTTS gốc đã có jitter ~3% / shimmer ~8% / HNR ~11-12 dB do độ
+#          thô của codec, cao hơn y văn cho tuổi 50-69. DSP không thể làm giọng "sạch" hơn nguồn,
+#          nên mục tiêu nam = baseline nguồn + mức tăng theo tuổi (xu hướng tăng dần được giữ).
+#          - f0_hz / speech_rate_syl_s là đích ADAPTIVE: engine đo giọng gốc rồi
+#            dịch/co giãn tới đích (không áp hệ số cố định).
+# qc     : dải chấp nhận của cổng QC (rộng hơn target, chỉ để bắt mẫu lỗi).
+# dsp    : tham số DSP nền (điểm khởi đầu; tools/calibrate_aging.py ghi đè vào `calibrated`).
+# traits : dải lấy mẫu "dấu vân tay" riêng từng cụ (seed = hash speaker.id).
+# =============================================================================
+profiles:
+  nam:
+    "50_59":
+      target: {f0_hz: 122.0, speech_rate_syl_s: 4.1, jitter_pct: 3.1, shimmer_pct: 8.0, hnr_db: 12.5}
+      qc: {f0_hz: [95, 150], jitter_pct: [0.5, 4.5], shimmer_pct: [2.0, 11.0], hnr_db: [7.0, 22.0], speech_rate_syl_s: [3.3, 5.0]}
+      dsp: {jitter_pct: 0.5, shimmer_db: 0.1, tremor_f0_depth: 0.0, tremor_amp_depth: 0.0, breathiness: 0.08, formant_warp: 0.99, spectral_tilt_db_oct: -0.5, creak_prob: 0.05, voice_break_prob: 0.0, pause_scale: 1.10, inhale_prob: 0.15, chest_warmth: 0.10, hf_cutoff_hz: 0}
+      traits: {f0_offset_st: [-1.2, 1.2], formant_warp: [-0.012, 0.012], hoarseness: [0.1, 0.45], tremor_severity: [0.0, 0.3], tremor_rate_hz: [5.0, 6.5], speech_rate_factor: [0.94, 1.08], pitch_range_scale: [0.95, 1.05], spectral_tilt_db_oct: [-0.4, 0.4]}
+    "60_69":
+      target: {f0_hz: 113.0, speech_rate_syl_s: 3.7, jitter_pct: 3.5, shimmer_pct: 9.0, hnr_db: 11.5}
+      qc: {f0_hz: [88, 140], jitter_pct: [0.8, 5.0], shimmer_pct: [3.0, 12.0], hnr_db: [6.0, 20.0], speech_rate_syl_s: [2.9, 4.6]}
+      dsp: {jitter_pct: 1.2, shimmer_db: 0.18, tremor_f0_depth: 0.006, tremor_amp_depth: 0.03, breathiness: 0.18, formant_warp: 0.98, spectral_tilt_db_oct: -1.0, creak_prob: 0.15, voice_break_prob: 0.0, pause_scale: 1.25, inhale_prob: 0.30, chest_warmth: 0.12, hf_cutoff_hz: 9000}
+      traits: {f0_offset_st: [-1.5, 1.5], formant_warp: [-0.012, 0.012], hoarseness: [0.2, 0.6], tremor_severity: [0.1, 0.5], tremor_rate_hz: [4.8, 6.2], speech_rate_factor: [0.92, 1.08], pitch_range_scale: [0.92, 1.02], spectral_tilt_db_oct: [-0.5, 0.5]}
+    "70_79":
+      target: {f0_hz: 120.0, speech_rate_syl_s: 3.2, jitter_pct: 4.1, shimmer_pct: 10.5, hnr_db: 10.5}
+      qc: {f0_hz: [90, 150], jitter_pct: [1.0, 6.5], shimmer_pct: [4.0, 14.0], hnr_db: [5.0, 18.0], speech_rate_syl_s: [2.4, 4.1]}
+      dsp: {jitter_pct: 2.0, shimmer_db: 0.28, tremor_f0_depth: 0.015, tremor_amp_depth: 0.06, breathiness: 0.3, formant_warp: 0.97, spectral_tilt_db_oct: -1.5, creak_prob: 0.30, voice_break_prob: 0.02, pause_scale: 1.45, inhale_prob: 0.50, chest_warmth: 0.15, hf_cutoff_hz: 8000}
+      traits: {f0_offset_st: [-1.5, 1.5], formant_warp: [-0.012, 0.012], hoarseness: [0.3, 0.8], tremor_severity: [0.3, 0.8], tremor_rate_hz: [4.5, 6.0], speech_rate_factor: [0.90, 1.08], pitch_range_scale: [0.90, 1.0], spectral_tilt_db_oct: [-0.6, 0.6]}
+    "80_plus":
+      target: {f0_hz: 128.0, speech_rate_syl_s: 2.8, jitter_pct: 4.8, shimmer_pct: 12.0, hnr_db: 9.5}
+      qc: {f0_hz: [95, 165], jitter_pct: [1.5, 8.0], shimmer_pct: [5.0, 16.0], hnr_db: [4.0, 16.0], speech_rate_syl_s: [2.0, 3.7]}
+      dsp: {jitter_pct: 3.0, shimmer_db: 0.4, tremor_f0_depth: 0.025, tremor_amp_depth: 0.10, breathiness: 0.42, formant_warp: 0.96, spectral_tilt_db_oct: -2.0, creak_prob: 0.40, voice_break_prob: 0.05, pause_scale: 1.70, inhale_prob: 0.70, chest_warmth: 0.18, hf_cutoff_hz: 7000}
+      traits: {f0_offset_st: [-1.5, 1.5], formant_warp: [-0.012, 0.012], hoarseness: [0.45, 0.95], tremor_severity: [0.5, 1.0], tremor_rate_hz: [4.2, 5.6], speech_rate_factor: [0.88, 1.08], pitch_range_scale: [0.88, 0.98], spectral_tilt_db_oct: [-0.6, 0.6]}
+  nu:
+    "50_59":
+      target: {f0_hz: 198.0, speech_rate_syl_s: 4.1, jitter_pct: 1.5, shimmer_pct: 5.5, hnr_db: 17.0}
+      qc: {f0_hz: [160, 240], jitter_pct: [0.4, 3.5], shimmer_pct: [2.0, 10.0], hnr_db: [8.0, 25.0], speech_rate_syl_s: [3.3, 5.0]}
+      dsp: {jitter_pct: 0.6, shimmer_db: 0.12, tremor_f0_depth: 0.0, tremor_amp_depth: 0.0, breathiness: 0.08, formant_warp: 0.99, spectral_tilt_db_oct: -0.5, creak_prob: 0.05, voice_break_prob: 0.0, pause_scale: 1.10, inhale_prob: 0.15, chest_warmth: 0.08, hf_cutoff_hz: 0}
+      traits: {f0_offset_st: [-1.2, 1.2], formant_warp: [-0.012, 0.012], hoarseness: [0.1, 0.45], tremor_severity: [0.0, 0.3], tremor_rate_hz: [5.0, 6.5], speech_rate_factor: [0.94, 1.08], pitch_range_scale: [0.95, 1.05], spectral_tilt_db_oct: [-0.4, 0.4]}
+    "60_69":
+      target: {f0_hz: 178.0, speech_rate_syl_s: 3.7, jitter_pct: 2.0, shimmer_pct: 6.5, hnr_db: 15.0}
+      qc: {f0_hz: [145, 220], jitter_pct: [0.7, 4.5], shimmer_pct: [3.0, 11.0], hnr_db: [7.0, 22.0], speech_rate_syl_s: [2.9, 4.6]}
+      dsp: {jitter_pct: 1.4, shimmer_db: 0.2, tremor_f0_depth: 0.008, tremor_amp_depth: 0.03, breathiness: 0.18, formant_warp: 0.98, spectral_tilt_db_oct: -1.0, creak_prob: 0.12, voice_break_prob: 0.0, pause_scale: 1.25, inhale_prob: 0.30, chest_warmth: 0.10, hf_cutoff_hz: 9500}
+      traits: {f0_offset_st: [-1.5, 1.5], formant_warp: [-0.012, 0.012], hoarseness: [0.2, 0.6], tremor_severity: [0.1, 0.5], tremor_rate_hz: [4.8, 6.2], speech_rate_factor: [0.92, 1.08], pitch_range_scale: [0.92, 1.02], spectral_tilt_db_oct: [-0.5, 0.5]}
+    "70_79":
+      target: {f0_hz: 168.0, speech_rate_syl_s: 3.2, jitter_pct: 2.7, shimmer_pct: 8.0, hnr_db: 13.0}
+      qc: {f0_hz: [135, 210], jitter_pct: [1.0, 6.0], shimmer_pct: [4.0, 13.0], hnr_db: [6.0, 20.0], speech_rate_syl_s: [2.4, 4.1]}
+      dsp: {jitter_pct: 2.4, shimmer_db: 0.32, tremor_f0_depth: 0.018, tremor_amp_depth: 0.06, breathiness: 0.3, formant_warp: 0.97, spectral_tilt_db_oct: -1.5, creak_prob: 0.25, voice_break_prob: 0.02, pause_scale: 1.45, inhale_prob: 0.50, chest_warmth: 0.12, hf_cutoff_hz: 8500}
+      traits: {f0_offset_st: [-1.5, 1.5], formant_warp: [-0.012, 0.012], hoarseness: [0.3, 0.8], tremor_severity: [0.3, 0.8], tremor_rate_hz: [4.5, 6.0], speech_rate_factor: [0.90, 1.08], pitch_range_scale: [0.90, 1.0], spectral_tilt_db_oct: [-0.6, 0.6]}
+    "80_plus":
+      target: {f0_hz: 162.0, speech_rate_syl_s: 2.8, jitter_pct: 3.5, shimmer_pct: 9.5, hnr_db: 11.0}
+      qc: {f0_hz: [128, 205], jitter_pct: [1.3, 7.5], shimmer_pct: [5.0, 15.0], hnr_db: [5.0, 18.0], speech_rate_syl_s: [2.0, 3.7]}
+      dsp: {jitter_pct: 3.4, shimmer_db: 0.45, tremor_f0_depth: 0.028, tremor_amp_depth: 0.10, breathiness: 0.42, formant_warp: 0.96, spectral_tilt_db_oct: -2.0, creak_prob: 0.35, voice_break_prob: 0.05, pause_scale: 1.70, inhale_prob: 0.70, chest_warmth: 0.14, hf_cutoff_hz: 7500}
+      traits: {f0_offset_st: [-1.5, 1.5], formant_warp: [-0.012, 0.012], hoarseness: [0.45, 0.95], tremor_severity: [0.5, 1.0], tremor_rate_hz: [4.2, 5.6], speech_rate_factor: [0.88, 1.08], pitch_range_scale: [0.88, 0.98], spectral_tilt_db_oct: [-0.6, 0.6]}
+
+# Hệ số điều chỉnh theo sắc thái câu nói (prompt tone). Cộng (add) hoặc nhân (mul) vào tham số nền.
+tone_modifiers:
+  panicked:   {f0_offset_st: 2.5, tempo_mul: 1.18, pause_mul: 0.75, breathiness_add: 0.06, range_mul: 1.12, inhale_prob: 0.9}
+  urgent:     {f0_offset_st: 1.8, tempo_mul: 1.12, pause_mul: 0.80, breathiness_add: 0.03, range_mul: 1.08}
+  in_pain:    {f0_offset_st: 1.2, tempo_mul: 0.95, pause_mul: 1.20, breathiness_add: 0.10, range_mul: 1.05, creak_add: 0.15}
+  breathless: {f0_offset_st: 0.8, tempo_mul: 1.00, pause_mul: 1.35, breathiness_add: 0.14, range_mul: 0.98, inhale_prob: 1.0}
+  strained:   {f0_offset_st: 1.5, tempo_mul: 1.05, pause_mul: 0.95, breathiness_add: 0.05, range_mul: 1.06}
+  calm:       {}
+  conversational: {range_mul: 1.02}
+  relaxed:    {tempo_mul: 0.97, pause_mul: 1.05}
+  gentle:     {f0_offset_st: 0.3, tempo_mul: 0.97, range_mul: 1.03}
+  cheerful:   {f0_offset_st: 0.8, tempo_mul: 1.03, range_mul: 1.08}
+
+# Vùng được ghi đè bởi tools/calibrate_aging.py (gender -> age_bin -> dsp overrides)
+calibrated:
+  nam:
+    "50_59": {jitter_pct: 1.4, shimmer_db: 0.05, breathiness: 0.104}
+    "60_69": {jitter_pct: 3.36, shimmer_db: 0.09, breathiness: 0.306}
+    "70_79": {jitter_pct: 4.4, shimmer_db: 0.364, breathiness: 0.51}
+    "80_plus": {jitter_pct: 6.6, shimmer_db: 0.3, breathiness: 0.714}
+  nu:
+    "50_59": {jitter_pct: 0.6, shimmer_db: 0.06, breathiness: 0.176}
+    "60_69": {jitter_pct: 1.82, shimmer_db: 0.1, breathiness: 0.396}
+    "70_79": {jitter_pct: 3.12, shimmer_db: 0.16, breathiness: 0.51}
+    "80_plus": {jitter_pct: 4.42, shimmer_db: 0.225, breathiness: 0.924}

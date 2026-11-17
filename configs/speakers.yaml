@@ -16,6 +16,9 @@ speakers:
     blend_ratio: 0.65
     cfg_scale: 1.15
     temperature: 0.75
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {giahuy: 0.55, huuduc: 0.45}
+    voice_traits: {hoarseness: 0.15, speech_rate_factor: 1.04, f0_offset_st: 0.4}
     prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
     profile_notes: "Nam trung niên 50 tuổi, giọng Sài Gòn điềm đạm, ấm áp, âm lượng rõ ràng."
 
@@ -34,6 +37,9 @@ speakers:
     blend_ratio: 0.70
     cfg_scale: 1.18
     temperature: 0.74
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {maichi: 0.6, kimoanh: 0.4}
+    voice_traits: {pitch_range_scale: 1.04, hoarseness: 0.3, formant_warp: 1.01}
     prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
     profile_notes: "Nữ 62 tuổi, giọng Hà Nội chuẩn, truyền cảm, ngữ điệu nhẹ nhàng và chững chạc."
 
@@ -52,6 +58,9 @@ speakers:
     blend_ratio: 0.85
     cfg_scale: 1.20
     temperature: 0.72
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {huuduc: 0.55, quangminh: 0.45}
+    voice_traits: {f0_offset_st: -1.4, speech_rate_factor: 0.9, formant_warp: 0.985}
     prosody_text: "Xin chào Gia An... Gia An có nghe rõ tôi nói không?"
     profile_notes: "Cụ ông 71 tuổi gốc Huế, giọng trầm sâu, nhịp nói thong thả, có độ ngắt nghỉ tự nhiên."
 
@@ -70,6 +79,9 @@ speakers:
     blend_ratio: 0.80
     cfg_scale: 1.22
     temperature: 0.73
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {kimoanh: 0.55, hamy: 0.45}
+    voice_traits: {hoarseness: 0.65, f0_offset_st: 0.6, speech_rate_factor: 0.95, formant_warp: 1.02}
     prosody_text: "Xin chào Gia An... Gia An có nghe rõ tôi nói không?"
     profile_notes: "Bà cụ 76 tuổi miền Tây, giọng hiền từ, hơi thở nhẹ, phát âm chân chất mộc mạc."
 
@@ -88,6 +100,9 @@ speakers:
     blend_ratio: 0.90
     cfg_scale: 1.25
     temperature: 0.70
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {huuduc: 1.0}
+    voice_traits: {hoarseness: 0.92, tremor_severity: 0.9, f0_offset_st: -0.8, speech_rate_factor: 0.9, formant_warp: 0.975}
     prosody_text: "Xin chào Gia An... Gia An... có nghe rõ tôi nói không?"
     profile_notes: "Cụ ông 82 tuổi, giọng già trầm khàn, nhịp nói chậm rãi, có độ rung tự nhiên do tuổi cao."
 
@@ -106,6 +121,9 @@ speakers:
     blend_ratio: 0.75
     cfg_scale: 1.20
     temperature: 0.74
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {baotrang: 0.45, kimoanh: 0.35, hamy: 0.2}
+    voice_traits: {speech_rate_factor: 1.06, hoarseness: 0.3, pitch_range_scale: 1.0}
     prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
     profile_notes: "Bà 67 tuổi vùng Thanh - Nghệ - Tĩnh, ngữ điệu dứt khoát, chất giọng ấm dạn dĩ."
 
@@ -124,6 +142,9 @@ speakers:
     blend_ratio: 0.60
     cfg_scale: 1.15
     temperature: 0.76
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {quangminh: 0.55, huuduc: 0.45}
+    voice_traits: {hoarseness: 0.12, speech_rate_factor: 1.06, f0_offset_st: 0.8}
     prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
     profile_notes: "Nam 58 tuổi miền Trung, giọng khỏe, âm vang rõ, nhịp nói dứt khoát tự nhiên."
 
@@ -142,6 +163,9 @@ speakers:
     blend_ratio: 0.60
     cfg_scale: 1.14
     temperature: 0.76
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {baotrang: 0.7, kimoanh: 0.3}
+    voice_traits: {hoarseness: 0.15, f0_offset_st: 0.5}
     prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
     profile_notes: "Nữ 54 tuổi, giọng miền Bắc đĩnh đạc, phát âm sắc nét, âm lượng đầy đặn."
 
@@ -160,6 +184,9 @@ speakers:
     blend_ratio: 0.75
     cfg_scale: 1.18
     temperature: 0.73
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {huuduc: 0.55, quangminh: 0.25, tiendat: 0.2}
+    voice_traits: {f0_offset_st: -0.9, hoarseness: 0.35, speech_rate_factor: 0.96, formant_warp: 0.99}
     prosody_text: "Xin chào Gia An, Gia An có nghe rõ tôi nói không?"
     profile_notes: "Nam 65 tuổi đồng bằng Bắc Bộ, giọng trầm ấm, phong thái từ tốn chuẩn mực."
 
@@ -178,6 +205,9 @@ speakers:
     blend_ratio: 0.85
     cfg_scale: 1.22
     temperature: 0.72
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {maichi: 0.45, baotrang: 0.35, kimoanh: 0.2}
+    voice_traits: {f0_offset_st: -0.6, hoarseness: 0.5, formant_warp: 0.99}
     prosody_text: "Xin chào Gia An... Gia An có nghe rõ tôi nói không?"
     profile_notes: "Cụ bà 73 tuổi Quảng Trị, âm sắc mộc mạc, tốc độ nói vừa phải, chất phác."
 
@@ -196,6 +226,9 @@ speakers:
     blend_ratio: 0.82
     cfg_scale: 1.20
     temperature: 0.71
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {tiendat: 0.65, huuduc: 0.35}
+    voice_traits: {f0_offset_st: -0.6, hoarseness: 0.45, speech_rate_factor: 0.95, formant_warp: 1.015}
     prosody_text: "Xin chào Gia An... Gia An có nghe rõ tôi nói không?"
     profile_notes: "Cụ ông 77 tuổi miền Tây sông nước, chất giọng hào sảng nhưng chậm rãi, điềm đạm."
 
@@ -214,5 +247,8 @@ speakers:
     blend_ratio: 0.88
     cfg_scale: 1.25
     temperature: 0.70
+    # v3.0: multi-voice latent mix + vocal fingerprint (unset traits are sampled per speaker)
+    voice_mix: {kimoanh: 0.9, baotrang: 0.1}
+    voice_traits: {tremor_severity: 0.9, hoarseness: 0.75, speech_rate_factor: 0.9, formant_warp: 0.975}
     prosody_text: "Xin chào Gia An... Gia An... có nghe rõ tôi nói không?"
     profile_notes: "Cụ bà 84 tuổi, giọng bà lão Nam Bộ đôn hậu, nhịp chậm, ngắt nghỉ từng nhịp."
